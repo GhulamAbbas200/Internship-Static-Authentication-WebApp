@@ -27,7 +27,7 @@ This repository contains a **static front-end authentication system** built usin
 
 ## 🌐 Live Demo
 
-🔗 [View Live on Vercel](https://testing-rho-woad.vercel.app/index.html/)
+🔗 [View Live on Vercel](https://testing-rho-woad.vercel.app)
 
 ---
 
