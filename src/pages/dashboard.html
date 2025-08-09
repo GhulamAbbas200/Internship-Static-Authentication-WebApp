@@ -11,15 +11,17 @@
   <header class="header">
     <a href="dashboard.html" class="logo">PicVerse</a>
     <nav class="navbar">
-        <button class="mobile-menu-toggle">
-            <i class="bi bi-menu-button"></i>
-        </button>
+        <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <i class="bi bi-list"></i>
+      </button>
       <button class="SignOutBtn" onclick="window.location.href='../index.html'">Sign Out</button>
     </nav>
   </header>
 
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
 <div class="dashboard-wrapper">
-  <aside class="sidebar">
+  <aside class="sidebar" id="sidebar">
     <ul>
     <li><a href="#" class="active"><i class="bi bi-house"></i> Home</a></li>
     <li><a href="#"><i class="bi bi-cloud-upload"></i> Upload</a></li>
@@ -27,9 +29,12 @@
     <li><a href="#"><i class="bi bi-gear"></i> Settings</a></li>
     <li><a href="change-password.html"><i class="bi bi-key"></i> Change Password</a></li>
   </ul>
+  <button class="mobile-menu-signout" onclick="window.location.href='../index.html'">
+    <i class="bi bi-box-arrow-right" style="margin-right: 8px;"></i>
+    Sign Out
+  </button>
   </aside>
 
-  <!-- MOVE THIS INSIDE -->
   <div class="dashboard">
     <h1>Welcome back, <span class="username">PicVerse User</span>!</h1>
     
@@ -52,70 +57,105 @@
 </div>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-    const mobileToggle = document.querySelector('.mobile-menu-toggle');
-    const sidebar = document.querySelector('.sidebar');
-    const sidebarOverlay = document.createElement('div');
-    
-    // Create overlay for mobile menu
-    sidebarOverlay.className = 'sidebar-overlay';
-    document.body.appendChild(sidebarOverlay);
-    
-    // Check if elements exist before adding event listeners
-    if (mobileToggle && sidebar) {
+      const mobileToggle = document.getElementById('mobileMenuToggle');
+      const sidebar = document.getElementById('sidebar');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
+      let isMenuOpen = false;
+      
+      // Check if elements exist before adding event listeners
+      if (mobileToggle && sidebar && sidebarOverlay) {
+        
         // Toggle sidebar when mobile button is clicked
-        mobileToggle.addEventListener('click', function() {
-            sidebar.classList.toggle('active');
-            sidebarOverlay.classList.toggle('active');
-            
-            // Prevent body scrolling when menu is open
-            if (sidebar.classList.contains('active')) {
-                document.body.style.overflow = 'hidden';
-            } else {
-                document.body.style.overflow = '';
-            }
+        mobileToggle.addEventListener('click', function(e) {
+          e.preventDefault();
+          toggleMenu();
         });
         
         // Close sidebar when overlay is clicked
         sidebarOverlay.addEventListener('click', function() {
-            sidebar.classList.remove('active');
-            sidebarOverlay.classList.remove('active');
-            document.body.style.overflow = '';
+          closeMenu();
         });
         
-        // Close sidebar when clicking on sidebar links (optional)
+        // Close sidebar when clicking on sidebar links
         const sidebarLinks = sidebar.querySelectorAll('a');
         sidebarLinks.forEach(link => {
-            link.addEventListener('click', function() {
-                if (window.innerWidth <= 768) {
-                    sidebar.classList.remove('active');
-                    sidebarOverlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                }
-            });
+          link.addEventListener('click', function() {
+            if (window.innerWidth <= 768) {
+              setTimeout(() => closeMenu(), 100);
+            }
+          });
         });
         
         // Handle window resize
         window.addEventListener('resize', function() {
-            if (window.innerWidth > 768) {
-                // Remove mobile menu classes on desktop
-                sidebar.classList.remove('active');
-                sidebarOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-            }
+          if (window.innerWidth > 768 && isMenuOpen) {
+            closeMenu();
+          }
         });
         
         // Handle escape key to close menu
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && sidebar.classList.contains('active')) {
-                sidebar.classList.remove('active');
-                sidebarOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-            }
+          if (e.key === 'Escape' && isMenuOpen) {
+            closeMenu();
+          }
         });
-    } else {
-        console.warn('Mobile toggle button or sidebar not found in HTML');
-    }
-});
-</script>
+        
+        function toggleMenu() {
+          if (!isMobile()) return;
+          
+          if (isMenuOpen) {
+            closeMenu();
+          } else {
+            openMenu();
+          }
+        }
+        
+        function openMenu() {
+          if (!isMobile()) return;
+          
+          isMenuOpen = true;
+          sidebar.classList.add('active');
+          sidebarOverlay.classList.add('active');
+          mobileToggle.innerHTML = '<i class="bi bi-x"></i>';
+          
+          // Prevent body scroll when menu is open
+          document.body.style.overflow = 'hidden';
+        }
+        
+        function closeMenu() {
+          isMenuOpen = false;
+          sidebar.classList.remove('active');
+          sidebarOverlay.classList.remove('active');
+          mobileToggle.innerHTML = '<i class="bi bi-list"></i>';
+          
+          // Restore body scroll
+          document.body.style.overflow = '';
+        }
+        
+        function isMobile() {
+          return window.innerWidth <= 768;
+        }
+        
+      } else {
+        console.warn('Mobile toggle button, sidebar, or overlay not found in HTML');
+      }
+    });
+
+    // Handle orientation change
+    window.addEventListener('orientationchange', function() {
+      setTimeout(() => {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const toggle = document.getElementById('mobileMenuToggle');
+        
+        if (sidebar && sidebar.classList.contains('active')) {
+          sidebar.classList.remove('active');
+          overlay.classList.remove('active');
+          toggle.innerHTML = '<i class="bi bi-list"></i>';
+          document.body.style.overflow = '';
+        }
+      }, 100);
+    });
+  </script>
 </body>
 </html>
