@@ -9,16 +9,28 @@
 </head>
 <body>
     <header class="header">
-        <a href="a" class="logo">PicVerse</a>
+        <a href="index.html" class="logo">PicVerse</a>
         <nav class="navbar">
             <a href="a">Home</a>
             <a href="a">About</a>
             <a href="a">Contact</a>
             <a href="pages/register.html">SignUp</a>
             <button class="SignInbt">SignIn</button>
-
         </nav>
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <i class="bi bi-list"></i>
+        </button>
     </header>
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+
+    <!-- Mobile Menu -->
+    <nav class="mobile-menu" id="mobileMenu">
+        <a href="index.html">Home</a>
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+        <a href="pages/register.html">SignUp</a>
+        <button class="SignInbt">SignIn</button>
+    </nav>
     <section class="section">
 
         <div class="left-side">
@@ -66,5 +78,102 @@
             </div>
         </div>
     </section>
+    <script>
+        // Mobile Navigation JavaScript
+        class MobileNavigation {
+            constructor() {
+                this.mobileMenuBtn = document.getElementById('mobileMenuBtn');
+                this.mobileMenu = document.getElementById('mobileMenu');
+                this.mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+                this.isMenuOpen = false;
+                
+                this.init();
+            }
+            
+            init() {
+                // Add event listeners
+                this.mobileMenuBtn.addEventListener('click', () => this.toggleMenu());
+                this.mobileMenuOverlay.addEventListener('click', () => this.closeMenu());
+                
+                // Close menu when clicking on menu items
+                const menuLinks = this.mobileMenu.querySelectorAll('a, button');
+                menuLinks.forEach(link => {
+                    link.addEventListener('click', () => this.closeMenu());
+                });
+                
+                // Close menu on escape key
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && this.isMenuOpen) {
+                        this.closeMenu();
+                    }
+                });
+                
+                // Handle window resize
+                window.addEventListener('resize', () => this.handleResize());
+            }
+            
+            toggleMenu() {
+                if (this.isMenuOpen) {
+                    this.closeMenu();
+                } else {
+                    this.openMenu();
+                }
+            }
+            
+            openMenu() {
+                this.isMenuOpen = true;
+                this.mobileMenu.classList.add('active');
+                this.mobileMenuOverlay.classList.add('active');
+                this.mobileMenuBtn.innerHTML = '<i class="bi bi-x"></i>';
+                
+                // Prevent body scroll when menu is open
+                document.body.style.overflow = 'hidden';
+            }
+            
+            closeMenu() {
+                this.isMenuOpen = false;
+                this.mobileMenu.classList.remove('active');
+                this.mobileMenuOverlay.classList.remove('active');
+                this.mobileMenuBtn.innerHTML = '<i class="bi bi-list"></i>';
+                
+                // Restore body scroll
+                document.body.style.overflow = '';
+            }
+            
+            handleResize() {
+                // Close mobile menu if window is resized to desktop size
+                if (window.innerWidth > 768 && this.isMenuOpen) {
+                    this.closeMenu();
+                }
+            }
+        }
+        
+        // Initialize mobile navigation when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new MobileNavigation();
+        });
+        
+        // Additional utility functions
+        function isMobileDevice() {
+            return window.innerWidth <= 768;
+        }
+        
+        function handleOrientationChange() {
+            // Close menu on orientation change
+            if (isMobileDevice()) {
+                const nav = document.querySelector('.mobile-menu');
+                if (nav && nav.classList.contains('active')) {
+                    nav.classList.remove('active');
+                    document.querySelector('.mobile-menu-overlay').classList.remove('active');
+                    document.querySelector('.mobile-menu-btn').innerHTML = '<i class="bi bi-list"></i>';
+                    document.body.style.overflow = '';
+                }
+            }
+        }
+        
+        // Handle orientation change
+        window.addEventListener('orientationchange', handleOrientationChange);
+        window.addEventListener('resize', handleOrientationChange);
+    </script>
 </body>
 </html>
